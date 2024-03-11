@@ -1,4 +1,5 @@
 interface Order {
+    [x: string]: any;
     order_number: string;
     customer_id: string;
     items: {

@@ -1,7 +1,9 @@
 
 import { getSession } from "@/actions/authentication";
+import LoginForm from "@/components/loginForm";
 import axios from "axios";
 import { redirect } from "next/navigation";
+
 
 // async function getData() {
 
@@ -18,20 +20,20 @@ import { redirect } from "next/navigation";
 
 
 
-export default async function Home() {
+export default async function Login() {
 
    //Login logic for Navbar
    const isLoggedIn: any = await getSession()
 
    console.log(` dataaaaaaa ${isLoggedIn.status}`);
 
-   if(isLoggedIn.status != 200){
-    redirect("/Login")
+   if(isLoggedIn.status == 200){
+    redirect("/Dashboard")
    }
 
   return (
-    <main>
-      hi
+    <main className="hero hero-overlay bg-base-100 ">
+    <LoginForm />
     </main>
   );
 }

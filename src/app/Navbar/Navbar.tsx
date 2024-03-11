@@ -1,4 +1,3 @@
-'use server'
 
 import Link from "next/link";
 import logo from "../../assets/logo.png";
@@ -6,44 +5,41 @@ import Image from "next/image";
 import { redirect } from "next/navigation";
 import Order from "@/model/Order";
 import { any } from "zod";
-import handler from "@/actions/orderActions";
-import orderSchema from "@/model/Invoice";
 import axios, { AxiosResponse } from "axios";
 import MenuItemList from "./MenuItem/MenuItemList";
+import ClientComponent from "./ClientComponents/ClientComponent";
+import { Children } from "react";
+import Drawer from "../Drawer/Drawer";
+import Logo from "./Logo";
+import ProfileMenu from "./MenuItem/ProfileMenu";
+import { revalidatePath } from "next/cache";
 const https = require('https');
 
-// async function Search(query: FormData) {
-//   "use server";
-//   const formdata = query.get("search")?.toString() || ''; // Provide a default value if formdata is undefined
-//   console.log(formdata);
-//   const data = await handler(formdata, any);
-//   if(formdata == ""){
-//     redirect('/')
-//   }else{
-//     try {
-//         console.log(data);
-        
-//   }finally{
-//     return
+async function Search(query: FormData) {
+  "use server";
+  const formdata = query.get("search")?.toString() || ''; // Provide a default value if formdata is undefined
     
+    redirect(`/Documents/${formdata}`)
 //   }
   
-// }
-// }
+}
 
 
 async function getData(): Promise<MenuItemsList> {
-    console.log("fetching");
+    "use server"
   
     const httpsAgent = new https.Agent({
       rejectUnauthorized: false,
     });
   
+    revalidatePath("/")
     try {
       const response: AxiosResponse<MenuItemsList> = await axios.get("https://192.168.1.66:443/navbar/", {
         httpsAgent: httpsAgent
       });
       const data: MenuItemsList = response.data;
+      revalidatePath("/")
+      
       return data;
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -70,23 +66,24 @@ async function getData(): Promise<MenuItemsList> {
 
   export default async function Navbar(){
 
+    const isOpen = false;
+
     const getdat:MenuItemsList = await getData()
-    console.log(getdat);
     
     
   return (
-    <div className="bg-base-content">
-      <div className="navbar max-w-7-xl m-auto flex-col sm:flex-row gap-2">
+    <>
+    <Drawer />
+    <div className="bg-base-content flex-1">
+      <div className="navbar flex-1 m-auto flex-col sm:flex-row gap-2">
         <div className="flex-1">
-          <Link href="/" className="btn btn-ghost text-base-300">
-            <Image src={logo} alt="logo" width={70} height={70}></Image>
-            <p className="align-top">®</p>
-          </Link>
+          <Logo />
+          <ClientComponent getData = {getData}>asd</ClientComponent>
         </div>
-        <form>
+        <form action={Search} method="get">
           <label className="input input-bordered flex items-center gap-2">
             <input type="text" className="grow" placeholder="Search" name="search" />
-            <button className="btn btn-ghost"><svg
+            <button type="submit" className="btn btn-ghost"><svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 16 16"
               fill="currentColor"
@@ -101,11 +98,15 @@ async function getData(): Promise<MenuItemsList> {
             </button>
           </label>
         </form>
-        <ul className="menu menu-vertical lg:menu-horizontal bg-base-100 rounded-l-box">
+        <ul className="menu menu-vertical lg:menu-horizontal bg-base-100 rounded-l-box gap-20">
         <MenuItemList menuItemsList={getdat} />
         </ul>
+        
       </div>
     </div>
+    
+    
+    </>
   );
 }
 

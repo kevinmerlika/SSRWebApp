@@ -17,9 +17,7 @@ import { redirect } from "next/navigation";
 // }
 
 
-
-export default async function Home() {
-
+export default async function Documents() {
    //Login logic for Navbar
    const isLoggedIn: any = await getSession()
 
@@ -28,6 +26,7 @@ export default async function Home() {
    if(isLoggedIn.status != 200){
     redirect("/Login")
    }
+  
 
   return (
     <main>
